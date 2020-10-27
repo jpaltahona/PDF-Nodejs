@@ -1,16 +1,9 @@
 const express = require('express');
 const bodyParser = require ("body-parser");
-const multer = require('multer');
 const path = require('path');
 const routes = require('./routes');
 const app = express();
-
-const storage = multer.diskStorage({
-    destination: path.join(__dirname ,'storage/pdf') ,
-    filename: (req, file, cb) => {
-        cb(null, file.originalname)
-    }
-});
+const fileUpload = require('express-fileupload');
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug')
@@ -20,19 +13,18 @@ app.set('port', process.env.PORT || 4000);
 app.use(  bodyParser.urlencoded({  extended: false }));
 app.use(bodyParser.json());
 
-// Subir archivos
-app.use(multer({
-    storage,
-    dest: path.join(__dirname ,'storage/pdf'),
-    limits: { fileSize: 6000000}
-}).fields(
-    [
-        {
-            name: 'pdf', maxCount: 1
-        }
-    ]
-));
-routes(app)
-app.use('/storage/images/', express.static(`${__dirname}/storage/pdf`));
+/* // Subir archivos
+app.use(fileUpload({
+    useTempFiles : true,c
+    tempFileDir : '/tmp/'
+})); */
 
+routes(app)
+//app.use('/storage/images/', express.static(`${__dirname}/storage/pdf`));
+//app.use('/storage/images/', express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, 'public')));
+
+const rutaFiles = path.join(__dirname, 'public');
+console.log(rutaFiles);
+app.use(express.static(rutaFiles));
 module.exports = app;
